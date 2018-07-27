@@ -1,2 +1,2 @@
-# vim-sog
-[wip] selection on github
+# vim-githubinator
+[wip] show selection on github
