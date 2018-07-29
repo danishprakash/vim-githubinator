@@ -35,20 +35,10 @@ function! GetRangeDelimiters() range
     return [l:beg, l:end]
 endfunction 
 
-" returns line numbers for selection
-function! GetRangeDelimiters() range
-    let l:beg = getpos("'<")[1]
-    let l:end = getpos("'>")[1]
-
-    return [l:beg, l:end]
-endfunction 
-
 " get remote URL from .git/config 
 function! s:generate_url() range
     if !isdirectory('.git')
-        echohl ErrorMsg
-        echo "Githubinator: No .git directory found"
-        echohl None
+        echoerr "githubinator: No .git directory found"
         return
     endif
 
@@ -65,14 +55,24 @@ endfunction
 function! GithubOpenURL() range
     let l:final_url = s:generate_url()
 
+    if !executable('open')
+        echoerr 'githubinator: `open` command not found. Try `ghc` to copy URL'
+        return
+    endif
+
     call system('open ' . l:final_url)
 endfunction
 
 function! GithubCopyURL() range
     let l:final_url = s:generate_url()
 
+    if !executable('pbcopy')
+        echoerr "githubinator: `pbcopy` command not found."
+        return
+    endif
+
     call system("echo " . l:final_url . " | pbcopy")
-    echo "Githubinator: URL copied to clipboard."
+    echom "Githubinator: URL copied to clipboard."
 endfunction
 
 vnoremap gho :call GithubOpenURL()<CR>
