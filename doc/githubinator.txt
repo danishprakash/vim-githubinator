@@ -1,0 +1,43 @@
+*githubinator*  show selected text on Github
+
+Author:  Danish Prakash <https://prakashdanish.github.io>
+Repo:    https://github.com/prakashdanish/vim-githubinator
+License: MIT
+
+=======================================================================
+Githubinator is a nifty little plugin which allows you to open snippets
+of text inside your editor directly on Github if a remote repo for the
+project exists.
+
+There are just a total of 3 requirements for this to work
+- You should be in the root of the project directory.
+- You have `open` command for gho
+- You have `pbcopy` command for ghc
+
+
+=======================================================================
+USAGE
+
+*gho*                     Open selected text on Github with the default
+                        browser using the `open` command if it is
+                        present, throws an error otherwise.
+
+*ghc*                     Same as gho except it doesn't open the browser
+                        but rather copies the said URL to the clipboard
+                        using pbcopy if it is present, throws an error
+                        otherwise.
+
+=======================================================================
+LICENSE
+
+MIT
+
+=======================================================================
+CONTRIBUTING
+
+Do you want to make this better? Open an issue and/or a PR on Github.
+Thanks!
+
+Github:    https://github.com/prakashdanish/vim-githubinator
+
+=======================================================================
