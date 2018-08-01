@@ -55,12 +55,12 @@ endfunction
 function! GithubOpenURL() range
     let l:final_url = s:generate_url()
 
-    if executable('open')
-        call system('open ' . l:final_url)
-    elseif executable('xdg-open')
+    if executable('xdg-open')
         call system('xdg-open ' . l:final_url)
+      elseif executable('open')
+        call system('open ' . l:final_url)
     else
-        echoerr 'githubinator: no `open` command found. Try `ghc` to copy URL'
+        echoerr 'githubinator: no `open` or equivalent command found. Try `ghc` to copy URL'
     endif
 endfunction
 
