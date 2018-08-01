@@ -57,7 +57,7 @@ function! GithubOpenURL() range
 
     if executable('xdg-open')
         call system('xdg-open ' . l:final_url)
-      elseif executable('open')
+    elseif executable('open')
         call system('open ' . l:final_url)
     else
         echoerr 'githubinator: no `open` or equivalent command found. Try `ghc` to copy URL'
