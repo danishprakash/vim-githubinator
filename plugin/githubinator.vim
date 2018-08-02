@@ -33,9 +33,9 @@ function! GetRangeDelimiters() range
     let l:end = getpos("'>")[1]
 
     return [l:beg, l:end]
-endfunction 
+endfunction
 
-" get remote URL from .git/config 
+" get remote URL from .git/config
 function! s:generate_url() range
     if !isdirectory('.git')
         echoerr "githubinator: No .git directory found"
@@ -50,7 +50,7 @@ function! s:generate_url() range
     let l:final_url = l:git_remote . '/blob/' . l:branch . '/' . l:file_name . '#L' . l:beg . '-L' . l:end
 
     return l:final_url
-endfunction 
+endfunction
 
 function! GithubOpenURL() range
     let l:final_url = s:generate_url()
@@ -79,5 +79,10 @@ function! GithubCopyURL() range
     echom "Githubinator: URL copied to clipboard."
 endfunction
 
-vnoremap gho :call GithubOpenURL()<CR>
-vnoremap ghc :call GithubCopyURL()<CR>
+vnoremap <silent> <Plug>(githubinator-open) :<C-U>call GithubOpenURL()<CR>
+vnoremap <silent> <Plug>(githubinator-copy) :<C-U>call GithubCopyURL()<CR>
+
+if get(g:, 'githubinator_no_default_mapping', 0) == 0
+    vmap <silent> gho <Plug>(githubinator-open)
+    vmap <silent> ghc <Plug>(githubinator-copy)
+endif
