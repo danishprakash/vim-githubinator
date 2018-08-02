@@ -55,23 +55,27 @@ endfunction
 function! GithubOpenURL() range
     let l:final_url = s:generate_url()
 
-    if !executable('open')
-        echoerr 'githubinator: `open` command not found. Try `ghc` to copy URL'
-        return
+    if executable('xdg-open')
+        call system('xdg-open ' . l:final_url)
+    elseif executable('open')
+        call system('open ' . l:final_url)
+    else
+        echoerr 'githubinator: no `open` or equivalent command found. Try `ghc` to copy URL'
     endif
-
-    call system('open ' . l:final_url)
 endfunction
 
 function! GithubCopyURL() range
     let l:final_url = s:generate_url()
 
-    if !executable('pbcopy')
-        echoerr "githubinator: `pbcopy` command not found."
+    if executable('pbcopy')
+        call system("echo " . l:final_url . " | pbcopy")
+    elseif executable('xsel')
+        call system("echo " . l:final_url . " | xsel -b")
+    else
+        echoerr "githubinator: no `copy-to-clipboard` command found."
         return
     endif
 
-    call system("echo " . l:final_url . " | pbcopy")
     echom "Githubinator: URL copied to clipboard."
 endfunction
 
