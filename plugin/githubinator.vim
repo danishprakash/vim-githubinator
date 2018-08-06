@@ -46,7 +46,7 @@ function! s:generate_url() range
     let l:beg = GetRangeDelimiters()[0]
     let l:end = GetRangeDelimiters()[1]
     let l:branch = system("git branch 2> /dev/null | awk '{print $2}' | tr -d '\n'")
-    let l:git_remote = system("cat .git/config | grep \"url\" | sed \"s/url.*://g\" | awk '{print \"https://github.com/\", $0}' | tr -d '[:blank:]' | sed \"s/\.git$//g\" | tr -d '\n'")
+    let l:git_remote = system("cat .git/config | grep \"remote \\\"origin\\\"\" -A1 | grep \"url\" | sed \"s/url.*://g\" | awk '{print \"https://github.com/\", $0}' | tr -d '[:blank:]' | sed \"s/\.git$//g\" | tr -d '\n'")
     let l:final_url = l:git_remote . '/blob/' . l:branch . '/' . l:file_name . '#L' . l:beg . '-L' . l:end
 
     return l:final_url
