@@ -11,21 +11,35 @@ project exists.
 
 There are just a total of 3 requirements for this to work
 - You should be in the root of the project directory.
-- You have `open` command for gho
-- You have `pbcopy` command for ghc
+- You have `open` command for |<Plug>(githubinator-open)|
+- You have `pbcopy` command for |<Plug>(githubinator-copy)|
 
 
 =======================================================================
-USAGE
+MAPPINGS
 
-*gho*                     Open selected text on Github with the default
-                        browser using the `open` command if it is
-                        present, throws an error otherwise.
+*<Plug>(githubinator-open)*
+    Open selected text on Github with the default browser using the
+    `open` command if it is present, throws an error otherwise.
 
-*ghc*                     Same as gho except it doesn't open the browser
-                        but rather copies the said URL to the clipboard
-                        using pbcopy if it is present, throws an error
-                        otherwise.
+*<Plug>(githubinator-copy)*
+    Same as |<Plug>(githubinator-open)| except it doesn't open the
+    browser but rather copies the said URL to the clipboard using
+    pbcopy if it is present, throws an error otherwise.
+
+=======================================================================
+DEFAULT MAPPINGS
+
+{lhs}     {rhs} ~
+--------  --------------------------- ~
+*gho*     |<Plug>(githubinator-open)|
+*ghc*     |<Plug>(githubinator-copy)|
+
+=======================================================================
+OPTIONS
+
+*g:githubinator_no_default_mapping* (default: 0)
+    Disable the default mappings if the value is not 0.
 
 =======================================================================
 LICENSE
