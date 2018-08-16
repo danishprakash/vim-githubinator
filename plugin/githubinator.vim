@@ -28,7 +28,7 @@
 " SOFTWARE.
 
 " returns line numbers for selection
-function! GetRangeDelimiters() range
+function! s:get_range_delimiters()
     let l:beg = getpos("'<")[1]
     let l:end = getpos("'>")[1]
 
@@ -36,23 +36,23 @@ function! GetRangeDelimiters() range
 endfunction
 
 " get remote URL from .git/config
-function! s:generate_url() range
-    if !isdirectory('.git')
-        echoerr "githubinator: No .git directory found"
+function! s:generate_url()
+    let l:root_dir = system('git rev-parse --show-toplevel')
+    if v:shell_error != 0
+        echoerr printf('githubinator: %s is NOT managed by git', getcwd())
         return
     endif
 
-    let l:file_name = expand("%")
-    let l:beg = GetRangeDelimiters()[0]
-    let l:end = GetRangeDelimiters()[1]
-    let l:branch = system("git branch 2> /dev/null | awk '{print $2}' | tr -d '\n'")
-    let l:git_remote = system("cat .git/config | grep \"url\" | sed \"s/url.*://g\" | awk '{print \"https://github.com/\", $0}' | tr -d '[:blank:]' | sed \"s/\.git$//g\" | tr -d '\n'")
-    let l:final_url = l:git_remote . '/blob/' . l:branch . '/' . l:file_name . '#L' . l:beg . '-L' . l:end
+    " In order to support relative filepath, convert full path and remove the git root path in it.
+    let l:file_name = expand('%:p')[len(root_dir) : -1]
+    let [l:beg, l:end] = s:get_range_delimiters()
+    let l:branch = system("git name-rev --name-only HEAD | tr -d '\n'")
+    let l:remote = system("git config remote.origin.url | sed -Ee 's!(git@|git://)!https://!' -e 's!:([^/])!/\\1!' -e 's!\.git$!!' | tr -d '\n'")
 
-    return l:final_url
+    return printf('%s/blob/%s/%s#L%d-L%d', l:remote, l:branch, l:file_name, l:beg, l:end)
 endfunction
 
-function! GithubOpenURL() range
+function! s:github_open_url()
     let l:final_url = s:generate_url()
 
     if executable('xdg-open')
@@ -64,23 +64,23 @@ function! GithubOpenURL() range
     endif
 endfunction
 
-function! GithubCopyURL() range
+function! s:github_copy_url()
     let l:final_url = s:generate_url()
 
     if executable('pbcopy')
-        call system("echo " . l:final_url . " | pbcopy")
+        call system('echo ' . l:final_url . ' | pbcopy')
     elseif executable('xsel')
-        call system("echo " . l:final_url . " | xsel -b")
+        call system('echo ' . l:final_url . ' | xsel -b')
     else
-        echoerr "githubinator: no `copy-to-clipboard` command found."
+        echoerr 'githubinator: no `copy-to-clipboard` command found.'
         return
     endif
 
-    echom "Githubinator: URL copied to clipboard."
+    echom 'Githubinator: URL copied to clipboard.'
 endfunction
 
-vnoremap <silent> <Plug>(githubinator-open) :<C-U>call GithubOpenURL()<CR>
-vnoremap <silent> <Plug>(githubinator-copy) :<C-U>call GithubCopyURL()<CR>
+vnoremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url()<CR>
+vnoremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url()<CR>
 
 if get(g:, 'githubinator_no_default_mapping', 0) == 0
     vmap <silent> gho <Plug>(githubinator-open)
