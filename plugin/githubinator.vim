@@ -37,17 +37,22 @@ endfunction
 
 " get remote URL from .git/config
 function! s:generate_url() range
-    if !isdirectory('.git')
+    let l:git_root = system("git rev-parse --show-toplevel | tr -d '\n'")
+    if !isdirectory(l:git_root)
         echoerr "githubinator: No .git directory found"
         return
     endif
 
-    let l:file_name = expand("%")
+    let l:file_name = expand("%:t")
+    let l:file_path = substitute(globpath(l:git_root, '**/' . l:file_name), l:git_root . '/', '', '')
+
     let l:beg = GetRangeDelimiters()[0]
     let l:end = GetRangeDelimiters()[1]
-    let l:branch = system("git branch 2> /dev/null | awk '{print $2}' | tr -d '\n'")
-    let l:git_remote = system("cat .git/config | grep \"url\" | sed \"s/url.*://g\" | awk '{print \"https://github.com/\", $0}' | tr -d '[:blank:]' | sed \"s/\.git$//g\" | tr -d '\n'")
-    let l:final_url = l:git_remote . '/blob/' . l:branch . '/' . l:file_name . '#L' . l:beg . '-L' . l:end
+
+    let l:branch = system("git rev-parse --abbrev-ref HEAD 2> /dev/null | tr -d '\n'")
+    let l:git_remote = fnamemodify(system("git config --get remote.origin.url | tr -d '\n'"), ':r')
+
+    let l:final_url = l:git_remote . '/blob/' . l:branch . '/' . l:file_path . '#L' . l:beg . '-L' . l:end
 
     return l:final_url
 endfunction
