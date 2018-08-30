@@ -27,6 +27,26 @@
 " OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 " SOFTWARE.
 
+let s:githubinator_host_map = {}
+if exists('g:githubinator_host_map')
+    let s:githubinator_host_map = g:githubinator_host_map
+endif
+let s:githubinator_host_map['git@github.com:'] = 'https://github.com/'
+let s:githubinator_host_map['git@gitlab.com:'] = 'https://gitlab.com/'
+let s:githubinator_host_map['git@bitbucket.org:'] = 'https://bitbucket.org/'
+let s:githubinator_host_map['https://\w*@bitbucket.org'] = 'https://bitbucket.org'
+
+
+function! s:parse_remote(url)
+    for [k, v] in items(s:githubinator_host_map)
+        if a:url =~# k
+            let l:url = substitute(a:url, k, v, '')
+            return l:url
+        endif
+    endfor
+    return a:url
+endfunction
+
 
 " get remote URL 
 function! s:generate_url(beg, end) range
@@ -45,12 +65,23 @@ function! s:generate_url(beg, end) range
         return ''
     endif
     " translate git protocal to https protocal
-    let l:git_remote = substitute(l:git_remote, '^git@github\.com:\(.*\)$', 'https://github.com/\1', '')
+    " let l:git_remote = substitute(l:git_remote, '^git@github\.com:\(.*\)$', 'https://github.com/\1', '')
+    let l:git_remote = <sid>parse_remote(l:git_remote)
     " remove .git
     let l:git_remote = substitute(l:git_remote, '.git$', '', '')
-    let l:final_url = l:git_remote . '/blob/' . l:branch . '/' . l:relative_path . l:file_name . '#L' . a:beg
+    if l:git_remote =~# 'https://bitbucket.org'
+      let l:final_url = l:git_remote . '/src/' . l:branch . '/' . l:relative_path . l:file_name . '#lines-' . a:beg
+    else
+      let l:final_url = l:git_remote . '/blob/' . l:branch . '/' . l:relative_path . l:file_name . '#L' . a:beg
+    endif
     if a:beg != a:end
-        let l:final_url .= '-L' . a:end
+        if l:final_url =~# 'http\(s\?\)://gitlab'
+            let l:final_url .= '-' . a:end
+        elseif l:final_url =~# 'https://bitbucket.org'
+            let l:final_url .= ':' . a:end
+        else
+            let l:final_url .= '-L' . a:end
+        endif
     endif
 
     return l:final_url
