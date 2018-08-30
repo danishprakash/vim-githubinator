@@ -21,25 +21,41 @@ MAPPINGS
 *<Plug>(githubinator-open)*
     Open selected text on Github with the default browser using the
     `open` command if it is present, throws an error otherwise.
+    Normal mapping accept a number to select the lines. 
 
 *<Plug>(githubinator-copy)*
     Same as |<Plug>(githubinator-open)| except it doesn't open the
     browser but rather copies the said URL to the clipboard using
     pbcopy if it is present, throws an error otherwise.
+    Normal mapping accept a number to select the lines. 
+
+If you don't define mapping, it will use the default mappings.
 
 =======================================================================
 DEFAULT MAPPINGS
 
-{lhs}     {rhs} ~
---------  --------------------------- ~
-*gho*     |<Plug>(githubinator-open)|
-*ghc*     |<Plug>(githubinator-copy)|
+{mode}  {lhs}     {rhs} ~
+------ --------  --------------------------- ~
+vn     *gho*     |<Plug>(githubinator-open)|
+vn     *ghc*     |<Plug>(githubinator-copy)|
 
 =======================================================================
-OPTIONS
+COMMAND
+*GHO*
+    Same as |<Plug>(githubinator-open)|
+    It accept a range number to select the lines. 
+eg: >
+3,5GHO
+.,+1GHO
+<
 
-*g:githubinator_no_default_mapping* (default: 0)
-    Disable the default mappings if the value is not 0.
+*GHC*
+    Same as |<Plug>(githubinator-copy)|
+    It accept a range number to select the lines. 
+eg: >
+3,5GHC
+.,+1GHO
+<
 
 =======================================================================
 LICENSE
@@ -55,3 +71,5 @@ Thanks!
 Github:    https://github.com/prakashdanish/vim-githubinator
 
 =======================================================================
+
+" vim:ft=help:iskeyword+=-:iskeyword+=58:iskeyword+=#"
