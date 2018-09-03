@@ -27,33 +27,39 @@
 " OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 " SOFTWARE.
 
-" returns line numbers for selection
-function! GetRangeDelimiters() range
-    let l:beg = getpos("'<")[1]
-    let l:end = getpos("'>")[1]
 
-    return [l:beg, l:end]
-endfunction
-
-" get remote URL from .git/config
-function! s:generate_url() range
-    if !isdirectory('.git')
-        echoerr "githubinator: No .git directory found"
-        return
-    endif
-
+" get remote URL 
+function! s:generate_url(beg, end) range
     let l:file_name = expand("%")
-    let l:beg = GetRangeDelimiters()[0]
-    let l:end = GetRangeDelimiters()[1]
     let l:branch = system("git branch 2> /dev/null | awk '{print $2}' | tr -d '\n'")
-    let l:git_remote = system("cat .git/config | grep \"url\" | sed \"s/url.*://g\" | awk '{print \"https://github.com/\", $0}' | tr -d '[:blank:]' | sed \"s/\.git$//g\" | tr -d '\n'")
-    let l:final_url = l:git_remote . '/blob/' . l:branch . '/' . l:file_name . '#L' . l:beg . '-L' . l:end
+    if l:branch == ''
+        echohl Error | echom 'Not a git repository' | echohl None
+        return ''
+    endif
+    " get the path relative to git repo
+    let l:relative_path = system("git rev-parse --show-prefix | tr -d '\n'")
+    " get remote url
+    let l:git_remote = system("git remote -v | head -n 1 | awk '{print $2}' | tr -d '\n'")
+    if l:git_remote == ''
+        echohl Error | echom 'No remote address' | echohl None
+        return ''
+    endif
+    " translate git protocal to https protocal
+    let l:git_remote = substitute(l:git_remote, '^git@github\.com:\(.*\)$', 'https://github.com/\1', '')
+    " remove .git
+    let l:git_remote = substitute(l:git_remote, '.git$', '', '')
+    let l:final_url = l:git_remote . '/blob/' . l:branch . '/' . l:relative_path . l:file_name . '#L' . a:beg
+    if a:beg != a:end
+        let l:final_url .= '-L' . a:end
+    endif
 
     return l:final_url
 endfunction
 
-function! GithubOpenURL() range
-    let l:final_url = s:generate_url()
+function! GithubOpenURL(beg, end) range
+    let l:final_url = s:generate_url(a:beg, a:end)
+    if l:final_url == ''
+    endif
 
     if executable('xdg-open')
         call system('xdg-open ' . l:final_url)
@@ -64,8 +70,8 @@ function! GithubOpenURL() range
     endif
 endfunction
 
-function! GithubCopyURL() range
-    let l:final_url = s:generate_url()
+function! GithubCopyURL(beg, end) range
+    let l:final_url = s:generate_url(a:beg, a:end)
 
     if executable('pbcopy')
         call system("echo " . l:final_url . " | pbcopy")
@@ -76,13 +82,26 @@ function! GithubCopyURL() range
         return
     endif
 
-    echom "Githubinator: URL copied to clipboard."
+    echom "URL copied: " . l:final_url
 endfunction
 
-vnoremap <silent> <Plug>(githubinator-open) :<C-U>call GithubOpenURL()<CR>
-vnoremap <silent> <Plug>(githubinator-copy) :<C-U>call GithubCopyURL()<CR>
+command! -range -nargs=0 GHO call GithubOpenURL(<line1>, <line2>)
+command! -range -nargs=0 GHC call GithubCopyURL(<line1>, <line2>)
 
-if get(g:, 'githubinator_no_default_mapping', 0) == 0
+vnoremap <silent> <Plug>(githubinator-open) :<C-U>call GithubOpenURL(getpos("'<")[1], getpos("'>")[1])<CR>
+vnoremap <silent> <Plug>(githubinator-copy) :<C-U>call GithubCopyURL(getpos("'<")[1], getpos("'>")[1])<CR>
+nnoremap <silent> <Plug>(githubinator-open) :<C-U>call GithubOpenURL(line('.'), line('.')+v:count)<CR>
+nnoremap <silent> <Plug>(githubinator-copy) :<C-U>call GithubCopyURL(line('.'), line('.')+v:count)<CR>
+
+if !hasmapto('<Plug>(githubinator-open)', 'v')
     vmap <silent> gho <Plug>(githubinator-open)
+endif
+if !hasmapto('<Plug>(githubinator-copy)', 'v')
     vmap <silent> ghc <Plug>(githubinator-copy)
+endif
+if !hasmapto('<Plug>(githubinator-open)', 'n')
+    nmap <silent> gho <Plug>(githubinator-open)
+endif
+if !hasmapto('<Plug>(githubinator-copy)', 'n')
+    nmap <silent> ghc <Plug>(githubinator-copy)
 endif
