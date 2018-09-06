@@ -46,9 +46,20 @@ function! s:generate_url()
     " In order to support relative filepath, convert full path and remove the git root path in it.
     let l:file_name = expand('%:p')[len(root_dir) : -1]
     let [l:beg, l:end] = s:get_range_delimiters()
-    let l:branch = system("git name-rev --name-only HEAD | tr -d '\n'")
-    let l:remote = system("git config remote.origin.url | sed -Ee 's!(git@|git://)!https://!' -e 's!:([^/])!/\\1!' -e 's!\.git$!!' | tr -d '\n'")
 
+    " Remove `tags/`.
+    let l:branch = system('git name-rev --name-only HEAD')
+    let l:branch = substitute(l:branch, '^tags//\|\n', '', '')
+
+    " Change URL scheme to https.
+    " Remove `.git` and newline.
+    " Change `:` to `/` (in case of ssh remote).
+    let l:remote = system('git config remote.origin.url')
+    let l:remote = substitute(l:remote, 'git@\|git:', 'https://', 'g')
+    let l:remote = substitute(l:remote, '\.git.$', '', '')
+    let l:remote = substitute(l:remote, ':\([^/]\)', '/\1', 'g')
+
+    " Build final URL.
     return printf('%s/blob/%s/%s#L%d-L%d', l:remote, l:branch, l:file_name, l:beg, l:end)
 endfunction
 
