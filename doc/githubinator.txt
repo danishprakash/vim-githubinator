@@ -6,21 +6,20 @@ License: MIT
 
 =======================================================================
 Githubinator is a nifty little plugin which allows you to open snippets
-of text inside your editor directly on Github if a remote repo for the
-project exists.
+of text inside your editor directly on remote repository if a remote
+repository for the project exists.
 
-There are just a total of 3 requirements for this to work
-- You should be in the root of the project directory.
-- You have `open` command for |<Plug>(githubinator-open)|
-- You have `pbcopy` command for |<Plug>(githubinator-copy)|
-
+There are just a total of 2 requirements for this to work
+- You have `open` or `xdg-open` command for |<Plug>(githubinator-open)|
+- You have `pbcopy` or `xsel` command for |<Plug>(githubinator-copy)|
 
 =======================================================================
 MAPPINGS
 
 *<Plug>(githubinator-open)*
-    Open selected text on Github with the default browser using the
-    `open` command if it is present, throws an error otherwise.
+    Open selected text on git remote repository with the default
+    browser using the `open` or `xdg-open` command if it is present,
+    throws an error otherwise.
 
 *<Plug>(githubinator-copy)*
     Same as |<Plug>(githubinator-open)| except it doesn't open the
@@ -30,10 +29,10 @@ MAPPINGS
 =======================================================================
 DEFAULT MAPPINGS
 
-{lhs}     {rhs} ~
---------  --------------------------- ~
-*gho*     |<Plug>(githubinator-open)|
-*ghc*     |<Plug>(githubinator-copy)|
+map {lhs}     {rhs} ~
+--- --------  --------------------------- ~
+v       *gho*     |<Plug>(githubinator-open)|
+v       *ghc*     |<Plug>(githubinator-copy)|
 
 =======================================================================
 OPTIONS
@@ -55,3 +54,4 @@ Thanks!
 Github:    https://github.com/prakashdanish/vim-githubinator
 
 =======================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:
