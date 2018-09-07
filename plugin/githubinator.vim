@@ -90,8 +90,8 @@ function! s:github_copy_url()
     echom 'Githubinator: URL copied to clipboard.'
 endfunction
 
-vnoremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url()<CR>
-vnoremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url()<CR>
+xnoremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url()<CR>
+xnoremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url()<CR>
 
 if get(g:, 'githubinator_no_default_mapping', 0) == 0
     vmap <silent> gho <Plug>(githubinator-open)
