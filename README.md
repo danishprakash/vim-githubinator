@@ -5,18 +5,20 @@
 </p>
 
 ## What?
-This plugin helps you select some text in vim visually and then open it in Github with the selection highlighted. This was inspired from [Githubinator](https://github.com/ehamiter/GitHubinator) for sublime.
+This plugin helps you select some text in vim visually and then open it in Github or other remote repository with the selection highlighted.
+This was inspired from [Githubinator](https://github.com/ehamiter/GitHubinator) for sublime.
 
-## Commands
+## Default commands
 ```text
-gho:      Open selected text on Github with the default
-          browser using the `open` command if it is
-          present, throws an error otherwise.
-          
-ghc:      Same as gho except it doesn't open the browser
-          but rather copies the said URL to the clipboard
-          using pbcopy if it is present, throws an error
-          otherwise.
+gho
+    Open selected text on git remote repository with the default
+    browser using the `open` or `xdg-open` command if it is present,
+    throws an error otherwise.
+
+ghc
+    Same as gho except it doesn't open the
+    browser but rather copies the said URL to the clipboard using
+    pbcopy if it is present, throws an error otherwise.
 ```
 
 ## Installation
