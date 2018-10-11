@@ -1,7 +1,7 @@
 " ================================================================
 " Name:         vim-githubinator: open highlighted text on Github
 " Maintainer:   Danish Prakash
-" HomePage:     https://github.com/prakashdanish/vim-githubinator
+" HomePage:     https://github.com/danishprakash/vim-githubinator
 " License:      MIT
 " ================================================================
 
@@ -32,12 +32,6 @@ function! s:get_range_delimiters()
     let l:beg = getpos("'<")[1]
     let l:end = getpos("'>")[1]
 
-    " if we aren't in a visual selection, then just get the row number
-    if l:end == 0 && l:beg == 0
-      let l:end = getpos(".")[1]
-      let l:beg = l:end
-    endif
-
     return [l:beg, l:end]
 endfunction
 
@@ -63,7 +57,9 @@ function! s:generate_url()
     let l:remote = system('git config remote.origin.url')
     let l:remote = substitute(l:remote, 'git@\|git:', 'https://', 'g')
     let l:remote = substitute(l:remote, '\.git.$', '', '')
+    echom string(l:remote)
     let l:remote = substitute(l:remote, ':\([^/]\)', '/\1', 'g')
+    echom string(l:remote)
 
     " Build final URL.
     return printf('%s/blob/%s/%s#L%d-L%d', l:remote, l:branch, l:file_name, l:beg, l:end)
@@ -96,13 +92,10 @@ function! s:github_copy_url()
     echom 'Githubinator: URL copied to clipboard.'
 endfunction
 
-noremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url()<CR>
-noremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url()<CR>
+vnoremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url()<CR>
+vnoremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url()<CR>
 
 if get(g:, 'githubinator_no_default_mapping', 0) == 0
     vmap <silent> gho <Plug>(githubinator-open)
     vmap <silent> ghc <Plug>(githubinator-copy)
-
-    nmap <silent> gho <Plug>(githubinator-open)
-    nmap <silent> ghc <Plug>(githubinator-copy)
 endif

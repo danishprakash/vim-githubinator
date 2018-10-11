@@ -22,9 +22,9 @@ ghc
 ```
 
 ## Installation
-Using [vim-zen](https://github.com/prakashdanish/vim-zen):
+Using [vim-zen](https://github.com/danishprakash/vim-zen):
 ```vim
-Plugin 'prakashdanish/vim-githubinator'
+Plugin 'danishprakash/vim-githubinator'
 ```
 
 ## Contributing
@@ -33,4 +33,4 @@ Do you want to make this better? Open an issue and/or a PR on Github. Thanks!
 ## License
 MIT License
 
-Copyright (c) 2018 [Danish Prakash](https://github.com/prakashdanish)
+Copyright (c) 2018 [Danish Prakash](https://github.com/danishprakash)
