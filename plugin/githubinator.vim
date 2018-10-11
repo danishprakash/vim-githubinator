@@ -32,6 +32,12 @@ function! s:get_range_delimiters()
     let l:beg = getpos("'<")[1]
     let l:end = getpos("'>")[1]
 
+    " if we aren't in a visual selection, then just get the row number
+    if l:end == 0 && l:beg == 0
+      let l:end = getpos(".")[1]
+      let l:beg = l:end
+    endif
+
     return [l:beg, l:end]
 endfunction
 
@@ -90,10 +96,13 @@ function! s:github_copy_url()
     echom 'Githubinator: URL copied to clipboard.'
 endfunction
 
-xnoremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url()<CR>
-xnoremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url()<CR>
+noremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url()<CR>
+noremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url()<CR>
 
 if get(g:, 'githubinator_no_default_mapping', 0) == 0
     vmap <silent> gho <Plug>(githubinator-open)
     vmap <silent> ghc <Plug>(githubinator-copy)
+
+    nmap <silent> gho <Plug>(githubinator-open)
+    nmap <silent> ghc <Plug>(githubinator-copy)
 endif
