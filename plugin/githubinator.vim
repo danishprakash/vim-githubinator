@@ -34,8 +34,8 @@ function! s:get_range_delimiters()
 
     " if we aren't in a visual selection, then just get the row number
     if l:end == 0 && l:beg == 0
-      let l:end = getpos(".")[1]
-      let l:beg = l:end
+        let l:end = getpos('.')[1]
+        let l:beg = l:end
     endif
 
     return [l:beg, l:end]
@@ -62,10 +62,8 @@ function! s:generate_url()
     " Change `:` to `/` (in case of ssh remote).
     let l:remote = system('git config remote.origin.url')
     let l:remote = substitute(l:remote, 'git@\|git:', 'https://', 'g')
-    let l:remote = substitute(l:remote, '\.git.$', '', '')
-    echom string(l:remote)
+    let l:remote = substitute(l:remote, '\.git.$\|\n', '', '')
     let l:remote = substitute(l:remote, ':\([^/]\)', '/\1', 'g')
-    echom string(l:remote)
 
     " Build final URL.
     return printf('%s/blob/%s/%s#L%d-L%d', l:remote, l:branch, l:file_name, l:beg, l:end)
