@@ -27,22 +27,17 @@
 " OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 " SOFTWARE.
 
-" returns line numbers for selection
-function! s:get_range_delimiters()
-    let l:beg = getpos("'<")[1]
-    let l:end = getpos("'>")[1]
-
-    " if we aren't in a visual selection, then just get the row number
-    if l:end == 0 && l:beg == 0
-        let l:end = getpos('.')[1]
-        let l:beg = l:end
+" returns line fragment
+function! s:get_line_fragment(mode)
+    if a:mode ==# 'v'
+        return printf('#L%d-L%d', line("'<"), line("'>"))
+    else
+        return printf('#L%d', line('.'))
     endif
-
-    return [l:beg, l:end]
 endfunction
 
 " get remote URL from .git/config
-function! s:generate_url()
+function! s:generate_url(mode)
     let l:root_dir = system('git rev-parse --show-toplevel')
     if v:shell_error != 0
         echoerr printf('githubinator: %s is NOT managed by git', getcwd())
@@ -51,7 +46,6 @@ function! s:generate_url()
 
     " In order to support relative filepath, convert full path and remove the git root path in it.
     let l:file_name = expand('%:p')[len(root_dir) : -1]
-    let [l:beg, l:end] = s:get_range_delimiters()
 
     " Remove `tags/`.
     let l:branch = system('git name-rev --name-only HEAD')
@@ -66,11 +60,11 @@ function! s:generate_url()
     let l:remote = substitute(l:remote, ':\([^/]\)', '/\1', 'g')
 
     " Build final URL.
-    return printf('%s/blob/%s/%s#L%d-L%d', l:remote, l:branch, l:file_name, l:beg, l:end)
+    return printf('%s/blob/%s/%s%s', l:remote, l:branch, l:file_name, s:get_line_fragment(a:mode))
 endfunction
 
-function! s:github_open_url()
-    let l:final_url = s:generate_url()
+function! s:github_open_url(mode)
+    let l:final_url = s:generate_url(a:mode)
 
     if executable('xdg-open')
         call system('xdg-open ' . l:final_url)
@@ -81,8 +75,8 @@ function! s:github_open_url()
     endif
 endfunction
 
-function! s:github_copy_url()
-    let l:final_url = s:generate_url()
+function! s:github_copy_url(mode)
+    let l:final_url = s:generate_url(a:mode)
 
     if executable('pbcopy')
         call system('echo ' . l:final_url . ' | pbcopy')
@@ -93,13 +87,13 @@ function! s:github_copy_url()
         return
     endif
 
-    echom 'Githubinator: URL copied to clipboard.'
+    echom 'Githubinator: URL copied to clipboard: ' . l:final_url
 endfunction
 
-vnoremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url()<CR>
-vnoremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url()<CR>
-noremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url()<CR>
-noremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url()<CR>
+vnoremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url('v')<CR>
+vnoremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url('v')<CR>
+nnoremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url('n')<CR>
+nnoremap <silent> <Plug>(githubinator-copy) :<C-U>call <SID>github_copy_url('n')<CR>
 
 if get(g:, 'githubinator_no_default_mapping', 0) == 0
     vmap <silent> gho <Plug>(githubinator-open)

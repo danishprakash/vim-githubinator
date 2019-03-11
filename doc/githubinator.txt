@@ -31,8 +31,10 @@ DEFAULT MAPPINGS
 
 map {lhs}     {rhs} ~
 --- --------  --------------------------- ~
-x       *gho*     |<Plug>(githubinator-open)|
-x       *ghc*     |<Plug>(githubinator-copy)|
+n       *gho*     |<Plug>(githubinator-open)|
+v       *gho*     |<Plug>(githubinator-open)|
+n       *ghc*     |<Plug>(githubinator-copy)|
+v       *ghc*     |<Plug>(githubinator-copy)|
 
 =======================================================================
 OPTIONS
