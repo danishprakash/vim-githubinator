@@ -77,17 +77,8 @@ endfunction
 
 function! s:github_copy_url(mode)
     let l:final_url = s:generate_url(a:mode)
-
-    if executable('pbcopy')
-        call system('echo ' . l:final_url . ' | pbcopy')
-    elseif executable('xsel')
-        call system('echo ' . l:final_url . ' | xsel -b')
-    else
-        echoerr 'githubinator: no `copy-to-clipboard` command found.'
-        return
-    endif
-
-    echom 'Githubinator: URL copied to clipboard: ' . l:final_url
+    let @+ = l:final_url
+    echom 'Githubinator: URL copied to clipboard ' . l:final_url
 endfunction
 
 vnoremap <silent> <Plug>(githubinator-open) :<C-U>call <SID>github_open_url('v')<CR>
